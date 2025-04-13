@@ -1,7 +1,6 @@
 "use client";
+import { ThemeMode } from "@/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
-
-type ThemeMode = "dark" | "light";
 
 interface ThemeContextType {
   mode: ThemeMode;
@@ -14,12 +13,16 @@ const ThemeProvider = ({ children }: React.PropsWithChildren) => {
   const [mode, setMode] = useState<ThemeMode>("light");
 
   const handleThemeChange = () => {
-    if (mode === "dark") {
-      setMode("light");
-      document.documentElement.classList.add("light");
-    } else {
+    if (
+      localStorage.theme === "dark" ||
+      (!("theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
       setMode("dark");
       document.documentElement.classList.add("dark");
+    } else {
+      setMode("light");
+      document.documentElement.classList.remove("dark");
     }
   };
 
