@@ -52,3 +52,14 @@ export interface BadgeCounts {
 export type BadgeCriteriaType = keyof typeof BADGE_CRITERIA;
 
 export type ThemeMode = "dark" | "light" | "system";
+
+export interface Question {
+  _id: string;
+  title: string;
+  tags: { _id: string; name: string }[];
+  author: { _id: string; name: string; picture: string };
+  upVotes: number;
+  views: number;
+  answers: Array<object>;
+  createdAt: Date;
+}

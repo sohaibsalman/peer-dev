@@ -5,50 +5,50 @@ import RenderTag from "./RenderTag";
 
 const hotQuestions = [
   {
-    _id: 1,
+    _id: "1",
     title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
   },
   {
-    _id: 2,
+    _id: "2",
     title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
   },
   {
-    _id: 3,
+    _id: "3",
     title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
   },
   {
-    _id: 4,
+    _id: "4",
     title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
   },
   {
-    _id: 5,
+    _id: "5",
     title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
   },
 ];
 
 const popularTags = [
   {
-    _id: 1,
+    _id: "1",
     name: "Javascript",
     totalQuestions: 50,
   },
   {
-    _id: 2,
+    _id: "2",
     name: "React",
     totalQuestions: 15,
   },
   {
-    _id: 3,
+    _id: "3",
     name: "Next",
     totalQuestions: 53,
   },
   {
-    _id: 4,
+    _id: "4",
     name: ".NET",
     totalQuestions: 99,
   },
   {
-    _id: 5,
+    _id: "5",
     name: "C#",
     totalQuestions: 5,
   },
