@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { ControllerRenderProps, useForm } from "react-hook-form";
 import { z } from "zod";
 import React, { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
@@ -21,7 +21,7 @@ import Image from "next/image";
 import { createQuestion } from "@/lib/actions/question.action";
 import { usePathname, useRouter } from "next/navigation";
 
-const type: any = "create";
+const type: string = "create";
 
 interface Props {
   mongoUserId: string;
@@ -65,7 +65,14 @@ const Question = ({ mongoUserId }: Props) => {
 
   const handleInputKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    field: any
+    field: ControllerRenderProps<
+      {
+        tags: string[];
+        title: string;
+        explanation: string;
+      },
+      "tags"
+    >
   ) => {
     if (e.key === "Enter" && field.name === "tags") {
       e.preventDefault();
@@ -92,7 +99,17 @@ const Question = ({ mongoUserId }: Props) => {
     }
   };
 
-  const handleTagRemove = (tag: string, field: any) => {
+  const handleTagRemove = (
+    tag: string,
+    field: ControllerRenderProps<
+      {
+        title: string;
+        tags: string[];
+        explanation: string;
+      },
+      "tags"
+    >
+  ) => {
     const newTags = field.value.filter((t: string) => t !== tag);
     form.setValue("tags", newTags);
   };

@@ -11,7 +11,6 @@ interface Props {
 }
 
 const LocalSearchbar = ({
-  route,
   iconPosition,
   imgSrc,
   placeholder,

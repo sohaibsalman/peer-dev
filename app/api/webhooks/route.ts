@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     if (event.type === "user.updated") {
       const { data } = event;
 
-      const mongoUser = await updateUser({
+      await updateUser({
         clerkId: data.id,
         updateData: {
           name: `${data.first_name}${
