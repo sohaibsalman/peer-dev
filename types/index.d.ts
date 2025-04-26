@@ -78,3 +78,12 @@ export interface UserProps {
   saved: Schema.Types.ObjectId[];
   joinedAt: Date;
 };
+
+export interface TagProps {
+  _id: string;
+  name: string;
+  description: string;
+  questions: QuestionProps[];
+  followers: UserProps[];
+  createdAt: Date;
+}
