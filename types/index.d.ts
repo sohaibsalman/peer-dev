@@ -53,7 +53,7 @@ export type BadgeCriteriaType = keyof typeof BADGE_CRITERIA;
 
 export type ThemeMode = "dark" | "light" | "system";
 
-export interface Question {
+export interface QuestionProps {
   _id: string;
   title: string;
   tags: { _id: string; name: string }[];
@@ -63,3 +63,18 @@ export interface Question {
   answers: Array<object>;
   createdAt: Date;
 }
+
+export interface UserProps {
+  _id: string;
+  clerkId: string;
+  name: string;
+  username: string;
+  email: string;
+  bio?: string;
+  picture: string;
+  location?: string;
+  portfolioWebsite?: string;
+  reputation?: number;
+  saved: Schema.Types.ObjectId[];
+  joinedAt: Date;
+};

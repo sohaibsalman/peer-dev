@@ -1,12 +1,12 @@
 import React from "react";
-import { Question } from "@/types";
+import { QuestionProps } from "@/types";
 import Link from "next/link";
 import RenderTag from "../shared/RenderTag";
 import Metric from "../shared/Metric";
 import { formatNumber, getTimestamp } from "@/lib/utils";
 
 interface Props {
-  question: Question;
+  question: QuestionProps;
 }
 
 const QuestionCard = ({ question }: Props) => {

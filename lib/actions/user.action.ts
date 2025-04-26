@@ -5,11 +5,13 @@ import { connectToDatabase } from "../mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
+  GetAllUsersParams,
   GetUserByIdParams,
   UpdateUserParams,
 } from "./shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
+import { UserProps } from "@/types";
 
 export async function getUserById(params: GetUserByIdParams) {
   try {
@@ -70,6 +72,21 @@ export async function deleteUser(params: DeleteUserParams) {
 
     const deletedUser = await User.findOneAndDelete(user._id);
     return deletedUser;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getAllUsers(params: GetAllUsersParams) {
+  try {
+    connectToDatabase();
+    // const { page = 1, pageSize = 20, filter, searchQuery } = params;
+
+    const users = await User.find<UserProps[]>({})
+      .sort({ createdAt: -1 })
+      .lean<UserProps[]>();
+    return { users };
   } catch (error) {
     console.log(error);
     throw error;
