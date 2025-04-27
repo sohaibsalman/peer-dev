@@ -14,7 +14,7 @@ import { QuestionProps } from "@/types";
 
 export async function createQuestion(params: CreateQuestionParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { title, content, tags, author, path } = params;
 
     const question = await Question.create({ title, content, author });
@@ -46,7 +46,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 
 export async function getQuestions() {
   try {
-    connectToDatabase();
+    await connectToDatabase();
 
     const questions = await Question.find({})
       .populate({
@@ -67,7 +67,7 @@ export async function getQuestions() {
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
 
     const question = await Question.findById<QuestionProps>(params.questionId)
       .populate({
@@ -90,7 +90,7 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
 
 export async function upVoteQuestion(params: QuestionVoteParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { questionId, userId, hasUpVoted, hasDownVoted, path } = params;
 
     let updateQuery = {};
@@ -125,7 +125,7 @@ export async function upVoteQuestion(params: QuestionVoteParams) {
 
 export async function downVoteQuestion(params: QuestionVoteParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { questionId, userId, hasUpVoted, hasDownVoted, path } = params;
 
     let updateQuery = {};

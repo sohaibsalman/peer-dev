@@ -13,7 +13,7 @@ import { AnswerProps } from "@/types";
 
 export async function createAnswer(params: CreateAnswerParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { content, author, question, path } = params;
 
     const newAnswer = await Answer.create({
@@ -38,7 +38,7 @@ export async function createAnswer(params: CreateAnswerParams) {
 
 export async function getAnswers(params: GetAnswersParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { questionId } = params;
 
     const answers = await Answer.find<AnswerProps>({ question: questionId })
@@ -54,7 +54,7 @@ export async function getAnswers(params: GetAnswersParams) {
 
 export async function upVoteAnswer(params: AnswerVoteParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { answerId, userId, hasUpVoted, hasDownVoted, path } = params;
 
     let updateQuery = {};
@@ -87,7 +87,7 @@ export async function upVoteAnswer(params: AnswerVoteParams) {
 
 export async function downVoteAnswer(params: AnswerVoteParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { answerId, userId, hasUpVoted, hasDownVoted, path } = params;
 
     let updateQuery = {};
