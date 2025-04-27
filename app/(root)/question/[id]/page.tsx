@@ -3,6 +3,7 @@ import AllAnswers from "@/components/shared/AllAnswers";
 import Metric from "@/components/shared/Metric";
 import ParseHTML from "@/components/shared/ParseHTML";
 import RenderTag from "@/components/shared/RenderTag";
+import Votes from "@/components/shared/Votes";
 import { getQuestionById } from "@/lib/actions/question.action";
 import { getUserById } from "@/lib/actions/user.action";
 import { formatNumber, getTimestamp } from "@/lib/utils";
@@ -25,6 +26,10 @@ const QuestionDetailPage = async ({ params }: ParamsProps) => {
   if (!mongoUser) redirect("sign-up");
   if (!question) return notFound();
 
+  function hasUserVoted(votes: string[], userId: string) {
+    return votes.some((id) => id.toString() === userId.toString());
+  }
+
   return (
     <>
       <div className="flex-start w-full flex-col">
@@ -45,7 +50,18 @@ const QuestionDetailPage = async ({ params }: ParamsProps) => {
             </p>
           </Link>
 
-          <div className="flex justify-end">VOTING</div>
+          <div className="flex justify-end">
+            <Votes
+              type="Question"
+              itemId={JSON.stringify(question._id)}
+              userId={JSON.stringify(mongoUser._id)}
+              upVotes={question.upvotes.length}
+              isUpVoted={hasUserVoted(question.upvotes, mongoUser._id)}
+              downVotes={question.downvotes.length}
+              isDownVoted={hasUserVoted(question.downvotes, mongoUser._id)}
+              isSaved={mongoUser?.saved.includes(question._id)}
+            />
+          </div>
         </div>
 
         <h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full text-left">
@@ -92,7 +108,7 @@ const QuestionDetailPage = async ({ params }: ParamsProps) => {
 
       <AllAnswers
         questionId={question._id}
-        userId={JSON.stringify(mongoUser?._id)}
+        userId={mongoUser?._id}
         totalAnswers={question.answers.length}
       />
 

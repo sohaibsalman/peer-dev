@@ -59,7 +59,8 @@ export interface QuestionProps {
   content: string;
   tags: { _id: string; name: string }[];
   author: UserProps;
-  upVotes: number;
+  upvotes: string[];
+  downvotes: string[];
   views: number;
   answers: AnswerProps[];
   createdAt: Date;
@@ -94,7 +95,7 @@ export interface AnswerProps {
   author: UserProps;
   question: QuestionProps;
   content: string;
-  upVotes: UserProps[];
-  downVotes: UserProps[];
+  upvotes: string[];
+  downvotes: string[];
   createdAt: Date;
 }
