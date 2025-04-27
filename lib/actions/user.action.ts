@@ -5,7 +5,6 @@ import { connectToDatabase } from "../mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
-  GetAllUsersParams,
   GetUserByIdParams,
   UpdateUserParams,
 } from "./shared.types";
@@ -18,7 +17,10 @@ export async function getUserById(params: GetUserByIdParams) {
     connectToDatabase();
 
     const { userId } = params;
-    const user = await User.findOne({ clerkId: userId });
+    const user = await User.findOne<UserProps>({
+      clerkId: userId,
+    }).lean<UserProps>();
+
     return user;
   } catch (error) {
     console.log(error);
@@ -78,7 +80,7 @@ export async function deleteUser(params: DeleteUserParams) {
   }
 }
 
-export async function getAllUsers(params: GetAllUsersParams) {
+export async function getAllUsers() {
   try {
     connectToDatabase();
     // const { page = 1, pageSize = 20, filter, searchQuery } = params;
@@ -86,6 +88,7 @@ export async function getAllUsers(params: GetAllUsersParams) {
     const users = await User.find<UserProps[]>({})
       .sort({ createdAt: -1 })
       .lean<UserProps[]>();
+
     return { users };
   } catch (error) {
     console.log(error);

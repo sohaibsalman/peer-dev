@@ -56,11 +56,12 @@ export type ThemeMode = "dark" | "light" | "system";
 export interface QuestionProps {
   _id: string;
   title: string;
+  content: string;
   tags: { _id: string; name: string }[];
-  author: { _id: string; name: string; picture: string };
+  author: UserProps;
   upVotes: number;
   views: number;
-  answers: Array<object>;
+  answers: AnswerProps[];
   createdAt: Date;
 }
 
@@ -77,7 +78,7 @@ export interface UserProps {
   reputation?: number;
   saved: Schema.Types.ObjectId[];
   joinedAt: Date;
-};
+}
 
 export interface TagProps {
   _id: string;
@@ -85,5 +86,15 @@ export interface TagProps {
   description: string;
   questions: QuestionProps[];
   followers: UserProps[];
+  createdAt: Date;
+}
+
+export interface AnswerProps {
+  _id: string;
+  author: UserProps;
+  question: QuestionProps;
+  content: string;
+  upVotes: UserProps[];
+  downVotes: UserProps[];
   createdAt: Date;
 }

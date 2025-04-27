@@ -25,10 +25,11 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   }
 }
 
-export async function getAllTags(params: GetAllTagsParams) {
+export async function getAllTags() {
   try {
     connectToDatabase();
-    const tags = await Tag.find<TagProps>({});
+    const tags = await Tag.find<TagProps>({}).lean<TagProps[]>();
+
     return { tags };
   } catch (error) {
     console.log(error);
