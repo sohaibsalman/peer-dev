@@ -77,7 +77,7 @@ export interface UserProps {
   location?: string;
   portfolioWebsite?: string;
   reputation?: number;
-  saved: Schema.Types.ObjectId[];
+  saved: QuestionProps[];
   joinedAt: Date;
 }
 

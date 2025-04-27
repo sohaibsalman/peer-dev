@@ -30,6 +30,12 @@ const QuestionDetailPage = async ({ params }: ParamsProps) => {
     return votes.some((id) => id.toString() === userId.toString());
   }
 
+  function isSaved() {
+    return mongoUser?.saved.some(
+      (id) => id.toString() === question?._id.toString()
+    );
+  }
+
   return (
     <>
       <div className="flex-start w-full flex-col">
@@ -59,7 +65,7 @@ const QuestionDetailPage = async ({ params }: ParamsProps) => {
               isUpVoted={hasUserVoted(question.upvotes, mongoUser._id)}
               downVotes={question.downvotes.length}
               isDownVoted={hasUserVoted(question.downvotes, mongoUser._id)}
-              isSaved={mongoUser?.saved.includes(question._id)}
+              isSaved={isSaved()}
             />
           </div>
         </div>
