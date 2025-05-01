@@ -14,7 +14,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 const QuestionDetailPage = async ({ params }: ParamsProps) => {
-  const question = await getQuestionById({ questionId: params.id });
+  const question = await getQuestionById({ questionId: (await params).id });
   const { userId: clerkId } = await auth();
 
   let mongoUser: UserProps | null = null;

@@ -13,7 +13,7 @@ import Link from 'next/link';
 const ProfileDetailPage = async ({ params }: URLProps) => {
   const { userId: clerkId } = await auth();
   const { user, totalQuestions, totalAnswers } = await getUserInfo({
-    userId: params.id,
+    userId: (await params).id,
   });
   return (
     <>

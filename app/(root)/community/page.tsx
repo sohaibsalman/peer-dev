@@ -6,7 +6,7 @@ import { getAllUsers } from "@/lib/actions/user.action";
 import Link from "next/link";
 
 const CommunityPage = async () => {
-  const { users } = await getAllUsers({});
+  const { users } = await getAllUsers();
 
   return (
     <>
