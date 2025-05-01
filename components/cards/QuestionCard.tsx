@@ -11,54 +11,54 @@ interface Props {
 
 const QuestionCard = ({ question }: Props) => {
   return (
-    <div className="card-wrapper p-9 sm:px-11 rounded-[10px]">
-      <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
-        <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
+    <div className='card-wrapper p-9 sm:px-11 rounded-[10px]'>
+      <div className='flex flex-col-reverse items-start justify-between gap-5 sm:flex-row'>
+        <span className='subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden'>
           {getTimestamp(question.createdAt)}
         </span>
         <Link href={`/question/${question._id}`}>
-          <h3 className="sm:h3-semi-bold base-semibold text-dark200_light900 line-clamp-1 flex-1">
+          <h3 className='sm:h3-semi-bold base-semibold text-dark200_light900 line-clamp-1 flex-1'>
             {question.title}
           </h3>
         </Link>
       </div>
       {/* TODO: if signed in and owner, add edit delete action */}
-      <div className="mt-3.5 flex flex-wrap gap-2">
+      <div className='mt-3.5 flex flex-wrap gap-2'>
         {question.tags.map((tag) => (
           <RenderTag key={tag._id} id={tag._id} name={tag.name} />
         ))}
       </div>
 
-      <div className="flex-between mt-6 w-full flex-wrap gap-3">
+      <div className='flex-between mt-6 w-full flex-wrap gap-3'>
         <Metric
           imgUrl={question.author.picture}
-          alt="user"
+          alt='user'
           value={question.author.name}
           title={` - asked ${getTimestamp(question.createdAt)}`}
-          href={`/profile/${question.author._id}`}
+          href={`/profile/${question.author.clerkId}`}
           isAuthor
-          textStyles="body-medium text-dark400_light700"
+          textStyles='body-medium text-dark400_light700'
         />
         <Metric
-          imgUrl="/assets/icons/like.svg"
-          alt="UpVotes"
+          imgUrl='/assets/icons/like.svg'
+          alt='UpVotes'
           value={formatNumber(question.upvotes.length)}
-          title=" Votes"
-          textStyles="small-medium text-dark400_light800"
+          title=' Votes'
+          textStyles='small-medium text-dark400_light800'
         />
         <Metric
-          imgUrl="/assets/icons/message.svg"
-          alt="Message"
+          imgUrl='/assets/icons/message.svg'
+          alt='Message'
           value={formatNumber(question.answers.length)}
-          title=" Answers"
-          textStyles="small-medium text-dark400_light800"
+          title=' Answers'
+          textStyles='small-medium text-dark400_light800'
         />
         <Metric
-          imgUrl="/assets/icons/eye.svg"
-          alt="Eye"
+          imgUrl='/assets/icons/eye.svg'
+          alt='Eye'
           value={formatNumber(question.views)}
-          title=" Views"
-          textStyles="small-medium text-dark400_light800"
+          title=' Views'
+          textStyles='small-medium text-dark400_light800'
         />
       </div>
     </div>

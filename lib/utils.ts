@@ -40,3 +40,8 @@ export const formatNumber = (num: number): string => {
     return num.toString();
   }
 };
+
+export function getJoinedDate(date: Date): string {
+  return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+}
+  
