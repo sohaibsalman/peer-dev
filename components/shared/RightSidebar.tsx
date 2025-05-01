@@ -5,24 +5,26 @@ import RenderTag from "./RenderTag";
 
 const hotQuestions = [
   {
-    _id: "1",
-    title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
+    _id: '1',
+    title: 'What is the difference between == and === in JavaScript?',
   },
   {
-    _id: "2",
-    title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
+    _id: '2',
+    title: 'Explain the concept of closures in JavaScript. How do they work?',
   },
   {
-    _id: "3",
-    title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
+    _id: '3',
+    title:
+      'What are the key differences between synchronous and asynchronous programming?',
   },
   {
-    _id: "4",
-    title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
+    _id: '4',
+    title:
+      'How does garbage collection work in high-level languages like Java or JavaScript?',
   },
   {
-    _id: "5",
-    title: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
+    _id: '5',
+    title: 'What is the difference between REST and GraphQL APIs?',
   },
 ];
 
