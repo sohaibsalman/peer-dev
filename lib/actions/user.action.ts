@@ -7,14 +7,15 @@ import {
   DeleteUserParams,
   GetSavedQuestionsParams,
   GetUserByIdParams,
+  GetUserStatsParams,
   ToggleSaveQuestionParams,
   UpdateUserParams,
-} from "./shared.types";
-import { revalidatePath } from "next/cache";
-import Question from "@/database/question.model";
-import { UserProps } from "@/types";
-import { FilterQuery } from "mongoose";
-import Tag from "@/database/tag.model";
+} from './shared.types';
+import { revalidatePath } from 'next/cache';
+import Question from '@/database/question.model';
+import { AnswerProps, QuestionProps, UserProps } from '@/types';
+import { FilterQuery } from 'mongoose';
+import Tag from '@/database/tag.model';
 import Answer from '@/database/answer.model';
 
 export async function getUserById(params: GetUserByIdParams) {
@@ -187,6 +188,51 @@ export async function getUserInfo(params: GetUserByIdParams) {
       totalQuestions,
       totalAnswers,
     };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getUserQuestions(params: GetUserStatsParams) {
+  try {
+    const { userId } = params;
+
+    const totalQuestions = await Question.countDocuments({
+      author: userId,
+    });
+
+    const userQuestions = await Question.find<QuestionProps>({ author: userId })
+      .sort({
+        views: -1,
+        upvotes: -1,
+      })
+      .populate('tags', '_id name')
+      .populate('author', '_id clerkId name picture');
+
+    return { totalQuestions, questions: userQuestions };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getUserAnswers(params: GetUserStatsParams) {
+  try {
+    const { userId } = params;
+
+    const totalAnswers = await Answer.countDocuments({
+      author: userId,
+    });
+
+    const userAnswers = await Answer.find<AnswerProps>({ author: userId })
+      .sort({
+        upvotes: -1,
+      })
+      .populate('question', '_id title')
+      .populate('author', '_id clerkId name picture');
+
+    return { totalAnswers, answers: userAnswers };
   } catch (error) {
     console.log(error);
     throw error;

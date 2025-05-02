@@ -1,4 +1,6 @@
+import AnswerTab from '@/components/shared/AnswerTab';
 import ProfileLink from '@/components/shared/ProfileLink';
+import QuestionTab from '@/components/shared/QuestionTab';
 import Stats from '@/components/shared/Stats';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,7 +12,7 @@ import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const ProfileDetailPage = async ({ params }: URLProps) => {
+const ProfileDetailPage = async ({ params, searchParams }: URLProps) => {
   const { userId: clerkId } = await auth();
   const { user, totalQuestions, totalAnswers } = await getUserInfo({
     userId: (await params).id,
@@ -84,8 +86,16 @@ const ProfileDetailPage = async ({ params }: URLProps) => {
               Answers
             </TabsTrigger>
           </TabsList>
-          <TabsContent value='top-posts'>POSTS</TabsContent>
-          <TabsContent value='answers'>ANSWERS</TabsContent>
+          <TabsContent value='top-posts'>
+            <QuestionTab searchParams={searchParams} userId={user._id} />
+          </TabsContent>
+          <TabsContent value='answers' className='flex w-full flex-col gap-6'>
+            <AnswerTab
+              searchParams={searchParams}
+              userId={user._id}
+              clerkId={clerkId}
+            />
+          </TabsContent>
         </Tabs>
       </div>
     </>
