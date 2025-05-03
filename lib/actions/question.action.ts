@@ -1,16 +1,20 @@
 "use server";
 
 import { connectToDatabase } from "../mongoose";
-import Question from "@/database/question.model";
-import Tag from "@/database/tag.model";
+import Question, { IQuestion } from '@/database/question.model';
+import Tag from '@/database/tag.model';
 import {
   CreateQuestionParams,
+  DeleteQuestionParams,
+  EditQuestionParams,
   GetQuestionByIdParams,
   QuestionVoteParams,
-} from "./shared.types";
-import User from "@/database/user.model";
-import { revalidatePath } from "next/cache";
-import { QuestionProps } from "@/types";
+} from './shared.types';
+import User from '@/database/user.model';
+import { revalidatePath } from 'next/cache';
+import { QuestionProps } from '@/types';
+import Answer from '@/database/answer.model';
+import Interaction from '@/database/interaction.model';
 
 export async function createQuestion(params: CreateQuestionParams) {
   try {
@@ -24,7 +28,7 @@ export async function createQuestion(params: CreateQuestionParams) {
     for (const tag of tags) {
       const existingTag = await Tag.findOneAndUpdate(
         {
-          name: { $regex: new RegExp(`^${tag}$`, "i") },
+          name: { $regex: new RegExp(`^${tag}$`, 'i') },
         },
         { $setOnInsert: { name: tag }, $push: { questions: question._id } },
         { upsert: true, new: true }
@@ -50,11 +54,11 @@ export async function getQuestions() {
 
     const questions = await Question.find({})
       .populate({
-        path: "tags",
+        path: 'tags',
         model: Tag,
       })
       .populate({
-        path: "author",
+        path: 'author',
         model: User,
       });
 
@@ -71,15 +75,16 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
 
     const question = await Question.findById<QuestionProps>(params.questionId)
       .populate({
-        path: "tags",
+        path: 'tags',
         model: Tag,
-        select: "_id name",
+        select: '_id name',
       })
       .populate({
-        path: "author",
+        path: 'author',
         model: User,
-        select: "_id clerkId name picture",
-      });
+        select: '_id clerkId name picture',
+      })
+      .lean<QuestionProps>();
 
     return question;
   } catch (error) {
@@ -111,7 +116,7 @@ export async function upVoteQuestion(params: QuestionVoteParams) {
     });
 
     if (!question) {
-      throw new Error("Question not found");
+      throw new Error('Question not found');
     }
 
     // Increment authors reputation
@@ -146,7 +151,7 @@ export async function downVoteQuestion(params: QuestionVoteParams) {
     });
 
     if (!question) {
-      throw new Error("Question not found");
+      throw new Error('Question not found');
     }
 
     // Increment authors reputation
@@ -157,3 +162,46 @@ export async function downVoteQuestion(params: QuestionVoteParams) {
     throw error;
   }
 }
+
+export async function deleteQuestion(params: DeleteQuestionParams) {
+  try {
+    await connectToDatabase();
+    const { questionId, path } = params;
+
+    await Question.deleteOne({ _id: questionId });
+    await Answer.deleteMany({ question: questionId });
+    await Interaction.deleteMany({ question: questionId });
+    await Tag.updateMany(
+      { questions: questionId },
+      { $pull: { questions: questionId } }
+    );
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function editQuestion(params: EditQuestionParams) {
+  try {
+    await connectToDatabase();
+    const { questionId, title, content, path } = params;
+
+    const question = await Question.findById<IQuestion>(questionId).populate(
+      'tags'
+    );
+
+    if (!question) throw new Error('Question not found');
+
+    question.title = title;
+    question.content = content;
+
+    await question.save();
+
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+} 

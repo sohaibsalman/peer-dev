@@ -10,6 +10,7 @@ interface Props extends SearchParamsProps {
 
 const AnswerTab = async ({ userId, clerkId }: Props) => {
   const { answers } = await getUserAnswers({ userId, page: 1 });
+
   return (
     <>
       {answers.map((answer) => (

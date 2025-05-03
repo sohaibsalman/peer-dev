@@ -18,30 +18,37 @@ import { Input } from "@/components/ui/input";
 import { questionsSchema } from "@/lib/validations";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
-import { createQuestion } from "@/lib/actions/question.action";
-import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "@/context/ThemeProvider";
+import { createQuestion, editQuestion } from '@/lib/actions/question.action';
+import { usePathname, useRouter } from 'next/navigation';
+import { useTheme } from '@/context/ThemeProvider';
 import { Editor as EditorType } from 'tinymce';
-
-const type: string = 'create';
+import { QuestionProps } from '@/types';
 
 interface Props {
   mongoUserId: string;
+  type?: 'create' | 'edit' | null;
+  questionDetails?: string | null;
 }
 
-const Question = ({ mongoUserId }: Props) => {
+const Question = ({ mongoUserId, type, questionDetails }: Props) => {
   const editorRef = useRef<EditorType>(null);
   const { mode } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
+  const parsedQuestionDetails = JSON.parse(
+    questionDetails || ''
+  ) as QuestionProps;
+
+  const groupedTags = parsedQuestionDetails.tags.map((tag) => tag.name);
+
   const form = useForm<z.infer<typeof questionsSchema>>({
     resolver: zodResolver(questionsSchema),
     defaultValues: {
-      title: '',
-      explanation: '',
-      tags: [],
+      title: parsedQuestionDetails?.title || '',
+      explanation: parsedQuestionDetails?.content || '',
+      tags: groupedTags || [],
     },
     mode: 'onSubmit',
   });
@@ -50,15 +57,25 @@ const Question = ({ mongoUserId }: Props) => {
     setIsSubmitting(true);
 
     try {
-      await createQuestion({
-        title: values.title,
-        content: values.explanation,
-        tags: values.tags,
-        author: JSON.parse(mongoUserId),
-        path: pathname,
-      });
+      if (type === 'edit') {
+        await editQuestion({
+          questionId: parsedQuestionDetails._id,
+          title: values.title,
+          content: values.explanation,
+          path: pathname,
+        });
+        router.push(`/question/${parsedQuestionDetails._id}`);
+      } else {
+        await createQuestion({
+          title: values.title,
+          content: values.explanation,
+          tags: values.tags,
+          author: JSON.parse(mongoUserId),
+          path: pathname,
+        });
 
-      router.push('/');
+        router.push('/');
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -158,7 +175,7 @@ const Question = ({ mongoUserId }: Props) => {
                 <Editor
                   apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
                   onInit={(_evt, editor) => (editorRef.current = editor)}
-                  initialValue=''
+                  initialValue={parsedQuestionDetails?.content || ''}
                   onBlur={field.onBlur}
                   onEditorChange={(content) => field.onChange(content)}
                   init={{
@@ -215,6 +232,7 @@ const Question = ({ mongoUserId }: Props) => {
                     onKeyDown={(e) => {
                       handleInputKeyDown(e, field);
                     }}
+                    disabled={type === 'edit'}
                   />
                   {field.value.length > 0 && (
                     <div className='flex-start mt-2.5 gap-2.5'>
@@ -223,16 +241,22 @@ const Question = ({ mongoUserId }: Props) => {
                           key={tag}
                           className='subtle-medium background-light800_dark300 text-light400_light500 
                             flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize'
-                          onClick={() => handleTagRemove(tag, field)}
+                          onClick={() =>
+                            type !== 'edit'
+                              ? handleTagRemove(tag, field)
+                              : () => {}
+                          }
                         >
                           {tag}
-                          <Image
-                            src='/assets/icons/close.svg'
-                            alt='Close icon'
-                            width={12}
-                            height={12}
-                            className=' cursor-pointer object-contain invert-0 dark:invert'
-                          />
+                          {type !== 'edit' && (
+                            <Image
+                              src='/assets/icons/close.svg'
+                              alt='Close icon'
+                              width={12}
+                              height={12}
+                              className=' cursor-pointer object-contain invert-0 dark:invert'
+                            />
+                          )}
                         </Badge>
                       ))}
                     </div>
