@@ -90,7 +90,7 @@ export async function deleteUser(params: DeleteUserParams) {
 export async function getAllUsers(params: GetAllUsersParams) {
   try {
     await connectToDatabase();
-    const { searchQuery } = params;
+    const { searchQuery, filter } = params;
 
     const query: FilterQuery<typeof User> = {};
 
@@ -105,8 +105,24 @@ export async function getAllUsers(params: GetAllUsersParams) {
       ];
     }
 
+    let sortOptions = {};
+
+    console.log('filter', filter);
+
+    switch (filter) {
+      case 'new_users':
+        sortOptions = { joinedAt: -1 };
+        break;
+      case 'old_users':
+        sortOptions = { joinedAt: 1 };
+        break;
+      case 'top_contributors':
+        sortOptions = { reputation: -1 };
+        break;
+    }
+
     const users = await User.find<UserProps[]>(query)
-      .sort({ createdAt: -1 })
+      .sort(sortOptions)
       .lean<UserProps[]>();
 
     return { users };
@@ -158,7 +174,7 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     await connectToDatabase();
 
-    const { clerkId, searchQuery } = params;
+    const { clerkId, searchQuery, filter } = params;
     const query: FilterQuery<typeof Question> = {};
 
     if (searchQuery) {
@@ -168,11 +184,33 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
       ];
     }
 
+    let sortOrder = {};
+
+    switch (filter) {
+      case 'most_recent':
+        sortOrder = { createdAt: -1 };
+        break;
+      case 'oldest':
+        sortOrder = { createdAt: 1 };
+        break;
+      case 'most_voted':
+        sortOrder = { upvotes: -1 };
+        break;
+      case 'most_viewed':
+        sortOrder = { views: -1 };
+        break;
+      case 'most_answered':
+        sortOrder = { answers: -1 };
+        break;
+      default:
+        break;
+    }
+
     const user = await User.findOne<UserProps>({ clerkId }).populate({
       path: 'saved',
       match: query,
       options: {
-        sort: { createdAt: -1 },
+        sort: sortOrder,
       },
       populate: [
         { path: 'tags', model: Tag, select: '_id name' },
