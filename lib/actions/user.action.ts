@@ -196,6 +196,7 @@ export async function getUserInfo(params: GetUserByIdParams) {
 
 export async function getUserQuestions(params: GetUserStatsParams) {
   try {
+    await connectToDatabase();
     const { userId } = params;
 
     const totalQuestions = await Question.countDocuments({
@@ -219,8 +220,9 @@ export async function getUserQuestions(params: GetUserStatsParams) {
 
 export async function getUserAnswers(params: GetUserStatsParams) {
   try {
-    const { userId } = params;
+    await connectToDatabase();
 
+    const { userId } = params;
     const totalAnswers = await Answer.countDocuments({
       author: userId,
     });
