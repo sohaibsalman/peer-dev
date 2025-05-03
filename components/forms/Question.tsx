@@ -37,11 +37,11 @@ const Question = ({ mongoUserId, type, questionDetails }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const parsedQuestionDetails = JSON.parse(
-    questionDetails || ''
-  ) as QuestionProps;
+  const parsedQuestionDetails =
+    (questionDetails && (JSON.parse(questionDetails || '') as QuestionProps)) ||
+    null;
 
-  const groupedTags = parsedQuestionDetails.tags.map((tag) => tag.name);
+  const groupedTags = parsedQuestionDetails?.tags.map((tag) => tag.name);
 
   const form = useForm<z.infer<typeof questionsSchema>>({
     resolver: zodResolver(questionsSchema),
@@ -59,12 +59,13 @@ const Question = ({ mongoUserId, type, questionDetails }: Props) => {
     try {
       if (type === 'edit') {
         await editQuestion({
-          questionId: parsedQuestionDetails._id,
+          questionId: parsedQuestionDetails?._id || '',
           title: values.title,
           content: values.explanation,
           path: pathname,
         });
-        router.push(`/question/${parsedQuestionDetails._id}`);
+
+        router.push(`/question/${parsedQuestionDetails?._id}`);
       } else {
         await createQuestion({
           title: values.title,

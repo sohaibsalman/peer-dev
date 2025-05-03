@@ -3,13 +3,14 @@
 import User from "@/database/user.model";
 import { connectToDatabase } from "../mongoose";
 import {
+  GetAllTagsParams,
   GetQuestionsByTagIdParams,
   GetTopInteractedTagsParams,
-} from "./shared.types";
-import Tag, { ITag } from "@/database/tag.model";
-import { TagProps } from "@/types";
-import Question from "@/database/question.model";
-import { FilterQuery } from "mongoose";
+} from './shared.types';
+import Tag, { ITag } from '@/database/tag.model';
+import { TagProps } from '@/types';
+import Question from '@/database/question.model';
+import { FilterQuery } from 'mongoose';
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
@@ -17,12 +18,12 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
     const { userId } = params;
     const user = await User.findById(userId);
 
-    if (!user) throw new Error("User not found");
+    if (!user) throw new Error('User not found');
 
     return [
-      { _id: "1", name: ".NET" },
-      { _id: "2", name: "React" },
-      { _id: "3", name: "Next" },
+      { _id: '1', name: '.NET' },
+      { _id: '2', name: 'React' },
+      { _id: '3', name: 'Next' },
     ];
   } catch (error) {
     console.log(error);
@@ -30,10 +31,22 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   }
 }
 
-export async function getAllTags() {
+export async function getAllTags(params: GetAllTagsParams) {
   try {
     await connectToDatabase();
-    const tags = await Tag.find<TagProps>({}).lean<TagProps[]>();
+
+    const { searchQuery } = params;
+    const query: FilterQuery<typeof Tag> = {};
+
+    if (searchQuery) {
+      query.$or = [
+        {
+          name: { $regex: new RegExp(searchQuery, 'i') },
+        },
+      ];
+    }
+
+    const tags = await Tag.find<TagProps>(query).lean<TagProps[]>();
 
     return { tags };
   } catch (error) {
