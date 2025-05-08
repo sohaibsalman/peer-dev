@@ -1,12 +1,12 @@
-import React from "react";
-import Filter from "./Filter";
-import { AnswerFilters } from "@/constants/filters";
-import { getAnswers } from "@/lib/actions/answer.action";
-import Link from "next/link";
-import Image from "next/image";
-import { getTimestamp } from "@/lib/utils";
-import ParseHTML from "./ParseHTML";
-import Votes from "./Votes";
+import Filter from './Filter';
+import { AnswerFilters } from '@/constants/filters';
+import { getAnswers } from '@/lib/actions/answer.action';
+import Link from 'next/link';
+import Image from 'next/image';
+import { getTimestamp } from '@/lib/utils';
+import ParseHTML from './ParseHTML';
+import Votes from './Votes';
+import Pagination from './Pagination';
 
 interface Props {
   questionId: string;
@@ -21,8 +21,13 @@ const AllAnswers = async ({
   totalAnswers,
   userId,
   filter,
+  page,
 }: Props) => {
-  const { answers } = await getAnswers({ questionId, sortBy: filter });
+  const { answers, isNext } = await getAnswers({
+    questionId,
+    sortBy: filter,
+    page,
+  });
 
   function hasUserVoted(votes: string[], userId: string) {
     return votes.some((id) => id.toString() === userId.toString());
@@ -78,6 +83,10 @@ const AllAnswers = async ({
             <ParseHTML data={answer.content} />
           </article>
         ))}
+
+        <div className='mt-5'>
+          <Pagination isNext={isNext} pageNumber={page ? page : 1} />
+        </div>
       </div>
     </div>
   );

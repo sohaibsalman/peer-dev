@@ -1,9 +1,10 @@
 import QuestionCard from "@/components/cards/QuestionCard";
 import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
-import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
-import { QuestionFilters } from "@/constants/filters";
-import { getSavedQuestions } from "@/lib/actions/user.action";
+import Pagination from '@/components/shared/Pagination';
+import LocalSearchbar from '@/components/shared/search/LocalSearchbar';
+import { QuestionFilters } from '@/constants/filters';
+import { getSavedQuestions } from '@/lib/actions/user.action';
 import { SearchParamsProps } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
@@ -11,14 +12,16 @@ import { redirect } from 'next/navigation';
 export default async function CollectionPage({
   searchParams,
 }: SearchParamsProps) {
+  const resolvedParams = await searchParams;
   const { userId: clerkId } = await auth();
 
   if (!clerkId) return redirect('sign-in');
 
-  const { questions } = await getSavedQuestions({
+  const { questions, isNext } = await getSavedQuestions({
     clerkId,
-    searchQuery: (await searchParams).q,
-    filter: (await searchParams).filter,
+    searchQuery: resolvedParams.q,
+    filter: resolvedParams.filter,
+    page: resolvedParams.page ? +resolvedParams.page : 1,
   });
 
   return (
@@ -52,6 +55,13 @@ export default async function CollectionPage({
             linkTitle='Browse Questions'
           />
         )}
+      </div>
+
+      <div className='mt-10'>
+        <Pagination
+          isNext={isNext}
+          pageNumber={resolvedParams?.page ? parseInt(resolvedParams.page!) : 1}
+        />
       </div>
     </>
   );

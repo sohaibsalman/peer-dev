@@ -12,6 +12,7 @@ import {
 } from './shared.types';
 import { AnswerProps } from '@/types';
 import Interaction from '@/database/interaction.model';
+import { paginate } from '../utils';
 
 export async function createAnswer(params: CreateAnswerParams) {
   try {
@@ -41,7 +42,7 @@ export async function createAnswer(params: CreateAnswerParams) {
 export async function getAnswers(params: GetAnswersParams) {
   try {
     await connectToDatabase();
-    const { questionId, sortBy } = params;
+    const { questionId, sortBy, page, pageSize } = params;
 
     let sortOptions = {};
 
@@ -62,11 +63,16 @@ export async function getAnswers(params: GetAnswersParams) {
         break;
     }
 
-    const answers = await Answer.find<AnswerProps>({ question: questionId })
+    const answersQuery = Answer.find<AnswerProps>({ question: questionId })
       .populate('author', '_id clerkId name picture')
       .sort(sortOptions);
 
-    return { answers };
+    const { data: answers, isNext } = await paginate(answersQuery, {
+      page,
+      pageSize,
+    });
+
+    return { answers, isNext };
   } catch (error) {
     console.log(error);
     throw error;

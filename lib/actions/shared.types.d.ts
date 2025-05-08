@@ -1,5 +1,5 @@
-import { Schema } from "mongoose";
-import { IUser } from "@/mongodb";
+import { Schema } from 'mongoose';
+import { IUser } from '@/mongodb';
 export interface CreateAnswerParams {
   content: string;
   author: string; // User ID
@@ -130,4 +130,15 @@ export interface GetUserStatsParams {
 }
 export interface DeleteUserParams {
   clerkId: string;
+}
+
+interface PaginateOptions {
+  page?: number;
+  pageSize?: number;
+}
+
+interface PaginateResult<T> {
+  data: T[];
+  isNext: boolean;
+  totalCount?: number;
 }

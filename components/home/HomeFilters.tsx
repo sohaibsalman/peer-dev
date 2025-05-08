@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { formUrlQuery } from '@/lib/utils';
 
 const HomeFilters = () => {
-  const [active, setActive] = useState('');
+  const [active, setActive] = useState('newest');
   const searchParams = useSearchParams();
   const router = useRouter();
 

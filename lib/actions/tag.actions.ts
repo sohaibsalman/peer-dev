@@ -7,10 +7,11 @@ import {
   GetQuestionsByTagIdParams,
   GetTopInteractedTagsParams,
 } from './shared.types';
-import Tag, { ITag } from '@/database/tag.model';
-import { TagProps } from '@/types';
-import Question from '@/database/question.model';
+import Tag from '@/database/tag.model';
+import { QuestionProps, TagProps } from '@/types';
+import Question, { IQuestion } from '@/database/question.model';
 import { FilterQuery } from 'mongoose';
+import { paginate } from '../utils';
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
@@ -35,7 +36,7 @@ export async function getAllTags(params: GetAllTagsParams) {
   try {
     await connectToDatabase();
 
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page, pageSize } = params;
     const query: FilterQuery<typeof Tag> = {};
 
     if (searchQuery) {
@@ -65,11 +66,16 @@ export async function getAllTags(params: GetAllTagsParams) {
         break;
     }
 
-    const tags = await Tag.find<TagProps>(query)
+    const tagsQuery = Tag.find<TagProps>(query)
       .sort(sortOptions)
       .lean<TagProps[]>();
 
-    return { tags };
+    const { data: tags, isNext } = await paginate(tagsQuery, {
+      page,
+      pageSize,
+    });
+
+    return { tags, isNext };
   } catch (error) {
     console.log(error);
     throw error;
@@ -80,28 +86,31 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
   try {
     await connectToDatabase();
 
-    const { tagId, searchQuery } = params;
+    const { tagId, searchQuery, page, pageSize } = params;
 
-    const tagFilter: FilterQuery<ITag> = { _id: tagId };
+    const tag = await Tag.findById<TagProps>(tagId).lean<TagProps>();
+    if (!tag) throw new Error('Tag not found');
 
-    const tag = await Tag.findOne<TagProps>(tagFilter).populate({
-      path: "questions",
-      model: Question,
-      match: searchQuery
-        ? { title: { $regex: searchQuery, $options: "i" } }
-        : {},
-      options: {
-        sort: { createdAt: -1 },
-      },
-      populate: [
-        { path: "tags", model: Tag, select: "_id name" },
-        { path: "author", model: User, select: "_id clerkId name picture" },
-      ],
-    });
+    const questionFilter: FilterQuery<IQuestion> = {
+      tags: tag._id,
+    };
 
-    if (!tag) throw new Error("Tag not found");
+    if (searchQuery) {
+      questionFilter.title = { $regex: searchQuery, $options: 'i' };
+    }
 
-    return { tagTitle: tag.name, questions: tag.questions };
+    const q = Question.find<QuestionProps>(questionFilter)
+      .sort({ createdAt: -1 })
+      .populate({ path: 'tags', model: Tag, select: '_id name' })
+      .populate({
+        path: 'author',
+        model: User,
+        select: '_id clerkId name picture',
+      });
+
+    const { data: questions, isNext } = await paginate(q, { page, pageSize });
+
+    return { tagTitle: tag.name, questions, isNext };
   } catch (error) {
     console.log(error);
     throw error;

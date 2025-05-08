@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import qs from 'query-string';
+import { Query } from 'mongoose';
+import { PaginateOptions, PaginateResult } from './actions/shared.types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -86,3 +88,18 @@ export const removeKeysFromQuery = ({
     { skipNull: true }
   );
 };
+
+export async function paginate<T>(
+  query: Query<T[], T>,
+  options: PaginateOptions
+): Promise<PaginateResult<T>> {
+  const { page = 1, pageSize = 10 } = options;
+  const skip = (page - 1) * pageSize;
+
+  const data = await query.skip(skip).limit(pageSize).exec();
+
+  const totalCount = await query.model.countDocuments(query.getQuery()).exec();
+  const isNext = totalCount > skip + data.length;
+
+  return { data, isNext, totalCount };
+}

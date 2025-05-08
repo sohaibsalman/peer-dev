@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
 const QuestionDetailPage = async ({ params, searchParams }: URLProps) => {
+  const resolvedParams = await searchParams;
   const question = await getQuestionById({ questionId: (await params).id });
   const { userId: clerkId } = await auth();
 
@@ -116,7 +117,8 @@ const QuestionDetailPage = async ({ params, searchParams }: URLProps) => {
         questionId={question._id}
         userId={mongoUser?._id}
         totalAnswers={question.answers.length}
-        filter={(await searchParams).filter}
+        filter={resolvedParams.filter}
+        page={resolvedParams.page ? +resolvedParams.page : 1}
       />
 
       <Answer

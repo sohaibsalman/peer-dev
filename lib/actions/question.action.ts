@@ -17,6 +17,7 @@ import { QuestionProps } from '@/types';
 import Answer from '@/database/answer.model';
 import Interaction from '@/database/interaction.model';
 import { FilterQuery } from 'mongoose';
+import { paginate } from '../utils';
 
 export async function createQuestion(params: CreateQuestionParams) {
   try {
@@ -54,7 +55,7 @@ export async function getQuestions(params: GetQuestionsParams) {
   try {
     await connectToDatabase();
 
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page, pageSize } = params;
 
     const query: FilterQuery<typeof Question> = {};
 
@@ -78,10 +79,11 @@ export async function getQuestions(params: GetQuestionsParams) {
         query.answers = { $size: 0 };
         break;
       default:
+        sortOptions = { createdAt: -1 };
         break;
     }
 
-    const questions = await Question.find(query)
+    const q = Question.find(query)
       .populate({
         path: 'tags',
         model: Tag,
@@ -92,7 +94,12 @@ export async function getQuestions(params: GetQuestionsParams) {
       })
       .sort(sortOptions);
 
-    return { questions };
+    const { data, isNext } = await paginate<QuestionProps>(q, {
+      page,
+      pageSize,
+    });
+
+    return { questions: data, isNext };
   } catch (error) {
     console.log(error);
     throw error;
